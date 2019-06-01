@@ -33,7 +33,7 @@ public class BotDriver {
 	private Scanner keyboardInput = new Scanner(System.in); //Scanner used to get any user inputs from the user
 	private final int STATUS_CHARACTER_MAX = 280; //Max amount of characters that can be used in a single tweet
 	private final int MAX_TWEETS_PER_THREE_HOURS = 300; //max amount of tweets allowed per hour by twitter via the api
-	private HashMap<Integer, String> tweets = new HashMap<Integer, String>(); //Hash map to load and store all the tweets
+	private HashMap<Integer, Tweet> tweets = new HashMap<Integer, Tweet>(); //Hash map to load and store all the tweets
 	private File logFile = new File(logFileLocation); //log file for the bot
 	private File directory = new File(tweetsDirectoryLocation); //Creates the file directory object for tweets
 	
@@ -103,7 +103,7 @@ public class BotDriver {
 				//Checks if the final tweet is greater than 0 and less than 280, if it is then add it to the hashmap, if not then skip it, add 1 to the counter
 				if(tweet.length() <= STATUS_CHARACTER_MAX && tweet.length() > 0) {
 					
-					this.tweets.put(mapCounter, tweet);
+					this.tweets.put(mapCounter, new Tweet("test"));
 					mapCounter++;
 					
 				}else {
@@ -142,7 +142,7 @@ public class BotDriver {
 		Random randomTweet = new Random();
 		int tweetAtPosition = randomTweet.nextInt(tweets.size());
 		
-		return tweets.get(tweetAtPosition);
+		return tweets.get(tweetAtPosition).getMessage();
 		
 	}
 	
