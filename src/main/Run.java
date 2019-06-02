@@ -22,7 +22,7 @@ public class Run {
 		
 		System.out.println("Starting DeRoche Bot...");
 		Run startBot = new Run();
-
+		
 	}
 	
 }
