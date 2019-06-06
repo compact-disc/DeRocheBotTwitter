@@ -15,9 +15,9 @@ import twitter4j.*;
 import java.util.Scanner;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Timer;
@@ -339,18 +339,20 @@ public class BotDriver {
 		
 		//Set the scanner and print writer to null to prepare to use
 		Scanner readLogs = null;
-		PrintWriter logWriter = null;
+		FileWriter logWriter = null;
 		
-		//Try and catch statement
+		//Try and catch statement for file writer
 		try {
 			
-			logWriter = new PrintWriter(this.logFileLocation); //setup print writer set to the log file
+			logWriter = new FileWriter(this.logFileLocation, true);
 			
-		} catch (FileNotFoundException e1) {
+		} catch (IOException e1) {
 			
+			System.out.println("Unable to set logWriter...");
 			e1.printStackTrace();
 			
 		}
+			
 		
 		//Try and catch statement
 		try {
@@ -366,11 +368,31 @@ public class BotDriver {
 		//while the scanner has a next word, read it and print to the file logs.txt
 		while(readLogs.hasNext()) {
 			
-			logWriter.println(readLogs.nextLine());
+			try {
+				
+				logWriter.write(readLogs.nextLine() + "\n");//write each line to the logs.txt file
+				
+			} catch (IOException e) {
+				
+				System.out.println("Unable to write log files to logs.txt...");
+				e.printStackTrace();
+				
+			}
 			
 		}
 		
-		logWriter.close(); //close the print writer
+		//try catch statement to close the print writer
+		try {
+			
+			logWriter.close(); //close the print writer
+			
+		} catch (IOException e) {
+			
+			System.out.println("Unable to close the logWriter...");
+			e.printStackTrace(); 
+			
+		} 
+		
 		setOutputStreamToConsole(); //go back to the console
 		System.out.println("'logs.txt' file saved..."); //print message about successful save to console
 		
