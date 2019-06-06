@@ -4,3 +4,4 @@
 .settings
 .properties
 twitter4j.properties
+*.properties
