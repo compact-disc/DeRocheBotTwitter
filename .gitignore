@@ -2,6 +2,5 @@
 .classpath
 .project
 .settings
-.properties
 twitter4j.properties
 *.properties
