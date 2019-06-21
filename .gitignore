@@ -4,3 +4,6 @@
 .settings
 twitter4j.properties
 *.properties
+/tweets/
+/tweets/logs/
+logs.txt

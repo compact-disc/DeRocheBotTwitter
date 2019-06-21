@@ -63,8 +63,18 @@ public class BotDriver {
 	//If at any time the user types in "stop" into the console, the program exits and saves properly
 	public void checkForStop() {
 		
-		//String to gather the stop message
-		String stopMessage = this.keyboardInput.next();
+		//string variable to collect the stop message from the user
+		String stopMessage;
+		
+		//if the tweets hash map is empty call the shutdown method
+		if(tweets.isEmpty()) {
+			
+			shutdownIfEmpty(); //call the shutdown method
+			
+		}
+		
+		//gather the stop message
+		stopMessage = this.keyboardInput.next();
 		
 		//No matter the case, if stop is entered it will stop the program
 		if(stopMessage.equalsIgnoreCase("stop")) {
@@ -75,6 +85,17 @@ public class BotDriver {
 			System.exit(0); //exit the program
 			
 		}
+		
+	}
+	
+	//method to shutdown the program properly
+	public void shutdownIfEmpty() {
+		
+		this.timer.cancel(); //cancel the timer when the program stops
+		writeLogs(); //write the logs to the system properly
+		System.out.println("There are no tweets to load...");
+		System.out.println("DeRoche Bot shutdown...");
+		System.exit(0); //exit the program
 		
 	}
 	
@@ -325,6 +346,7 @@ public class BotDriver {
 		}
 		
 		System.out.println("Logs loaded. Switching from console to 'logs.txt' file..."); //print message about successful log file
+		System.out.println("Type 'stop' to shut down the program...");
 		System.out.println();
 		setOutputStreamToLogFile(); //set the print stream to the log file
 		System.out.println("Successfully switched to 'logs.txt' file..."); //Print first message to log file
