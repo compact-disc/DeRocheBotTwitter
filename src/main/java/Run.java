@@ -10,6 +10,7 @@ package main.java;
 
 public class Run {
 	
+	@SuppressWarnings("unused")
 	private BotDriver derocheBot;
 	
 	public Run() {
@@ -18,6 +19,7 @@ public class Run {
 		
 	}
 
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 		
 		System.out.println("Starting DeRoche Bot...");

@@ -120,6 +120,7 @@ public class BotDriver {
 	}
 	
 	//Method to load all the tweets in the folder to a hashmap
+	@SuppressWarnings("resource")
 	public void loadTweets() {
 
 		//Variables for the method
@@ -212,6 +213,7 @@ public class BotDriver {
 	}
 	
 	//Method to tweet a new status to twitter takes a String parameter and that is the message the user entered
+	@SuppressWarnings("unused")
 	public void statusUpdate() {
 		
 		//Creates twitter object to connect
