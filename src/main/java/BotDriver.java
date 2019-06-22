@@ -6,7 +6,7 @@
  * Driver class for DeRoche_Bot twitter bot
  */
 
-package main;
+package main.java;
 
 //imports for twitter4j api
 import twitter4j.*;
