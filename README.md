@@ -33,4 +33,3 @@ oauth.accessToken=       // your token <br/>
 oauth.accessTokenSecret= // your token secret <br/>
 
 ### [My Twitter @dr_deroche](https://twitter.com/dr_deroche)
-I created this so I could tweet random things automatically, but also practice writing code and using API.
