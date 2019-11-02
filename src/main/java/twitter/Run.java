@@ -6,7 +6,7 @@
  * Class to start the program
  */
 
-package main.java;
+package twitter;
 
 public class Run {
 	

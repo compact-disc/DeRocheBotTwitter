@@ -6,7 +6,7 @@
  * The tweet object class to store each tweet in its own object
  */
 
-package main.java;
+package twitter;
 
 public class Tweet {
 	
