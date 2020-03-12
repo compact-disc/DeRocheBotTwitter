@@ -22,7 +22,6 @@ public class Run {
 	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 		
-		System.out.println("Starting DeRoche Bot...");
 		Run startBot = new Run();
 		
 	}
