@@ -55,7 +55,7 @@ public class TweetLogger {
 	 */
 	protected void warning(String warning) {
 		
-		logger.warning(warning + "\n");
+		logger.warning(warning);
 		
 	}
 	
@@ -66,7 +66,7 @@ public class TweetLogger {
 	 */
 	protected void info(String information) {
 		
-		logger.info(information + "\n");
+		logger.info(information);
 		
 	}
 	
@@ -77,7 +77,7 @@ public class TweetLogger {
 	 */
 	protected void severe(String severe) {
 		
-		logger.severe(severe + "\n");
+		logger.severe(severe);
 		
 	}
 	

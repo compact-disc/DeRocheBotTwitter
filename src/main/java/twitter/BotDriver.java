@@ -29,29 +29,36 @@ public class BotDriver {
 	private Timer timer; //timer variable
 
 	//Files and directories
-	private String logFileLocation = "tweets/logs/logs.txt"; //the log file location
 	private String tweetsDirectoryLocation = "tweets"; //root tweets directory
-	private String logDirectoryLocation = "tweets/logs"; //logs directory
 	
 	//private instance variables to use in the program
 	private Scanner keyboardInput = new Scanner(System.in); //Scanner used to get any user inputs from the user
 	private final int STATUS_CHARACTER_MAX = 280; //Max amount of characters that can be used in a single tweet
 	private HashMap<Integer, Tweet> tweets = new HashMap<Integer, Tweet>(); //Hash map to load and store all the tweets
-	private File logFile = new File(logFileLocation); //log file for the bot
 	private File directory = new File(tweetsDirectoryLocation); //Creates the file directory object for tweets
 	private int intervalInMilliseconds; //rate of timer in milliseconds to use for timer
 	
-	//private instance variables for logging variables
-	private PrintStream loggingFilePrintStream = null; //print stream for the logging file
-	private PrintStream consoleStream = System.out; //variable to set the logging back to the console if needed
-	private File temporaryLogFile = null; //file for the temporary log file until it is written to the logs.txt file
+	//Logger class
+	private TweetLogger log;
 	
 	//default constructor to start the driver when called from run
 	public BotDriver() {
 		
-		System.out.println("Starting Bot Driver...");
+		log = new TweetLogger("DeRoche_Bot"); //create the log class
+		log.info("Starting Bot Driver");
+		
+		//Sleep for 100 milliseconds so the logger can be properly created before calling other methods
+		try {
+			
+			Thread.sleep(100);
+			
+		} catch (InterruptedException e) {
+			
+			log.severe("Thread sleep error");
+			e.printStackTrace();
+		}
+		
 		setTimers(); //set the timers for the bot
-		startLoggingSystem(); //start the logging system
 		checkForAllFilesAndDirectories(); //check for all the files and directories 
 		loadTweets(); //load all the tweets into the map
 		this.timer = new Timer(); //create new timer object
@@ -61,7 +68,7 @@ public class BotDriver {
 	}
 	
 	//If at any time the user types in "stop" into the console, the program exits and saves properly
-	public void checkForStop() {
+	private void checkForStop() {
 		
 		//string variable to collect the stop message from the user
 		String stopMessage;
@@ -80,8 +87,7 @@ public class BotDriver {
 		if(stopMessage.equalsIgnoreCase("stop")) {
 			
 			this.timer.cancel(); //cancel the timer when the program stops
-			writeLogs(); //write the logs to the system properly
-			System.out.println("DeRoche Bot shutdown...");
+			log.info("DeRoche Bot shutdown");
 			System.exit(0); //exit the program
 			
 		}
@@ -89,18 +95,17 @@ public class BotDriver {
 	}
 	
 	//method to shutdown the program properly
-	public void shutdownIfEmpty() {
+	private void shutdownIfEmpty() {
 		
 		this.timer.cancel(); //cancel the timer when the program stops
-		writeLogs(); //write the logs to the system properly
-		System.out.println("There are no tweets to load...");
-		System.out.println("DeRoche Bot shutdown...");
+		log.warning("There are no tweets to load");
+		log.info("DeRoche Bot shutdown");
 		System.exit(0); //exit the program
 		
 	}
 	
 	//Method to set the intervals for tweets
-	public void setTimers() {
+	private void setTimers() {
 		
 		int intervalInMinutes; //variable to collect the timer in minutes
 		
@@ -108,20 +113,21 @@ public class BotDriver {
 		do {
 			
 			//Line and gathering of data for timer
-			System.out.print("Enter a time (in minutes) to tweet (minimum 30 minutes): ");
+			System.out.print("Enter a time interval (in minutes) to tweet: ");
 			intervalInMinutes = this.keyboardInput.nextInt();
 			
-		}while(intervalInMinutes < 30); //keep running the loop if the timer is below 30
+		}while(intervalInMinutes <= 1); //keep running the loop if the timer is below 1
 		
 		//Convert the time entered from second to milliseconds for the timer
 		this.intervalInMilliseconds = intervalInMinutes * 60000;
 		
+		log.info("Type in 'stop' to stop the program at any time");
 		
 	}
 	
 	//Method to load all the tweets in the folder to a hashmap
 	@SuppressWarnings("resource")
-	public void loadTweets() {
+	private void loadTweets() {
 
 		//Variables for the method
 		String tweet;
@@ -135,7 +141,7 @@ public class BotDriver {
 				
 				if(!tweetFile.getName().equals("logs")) {
 					
-					System.out.println("'" + tweetFile.getName() + "'" + " is a directory, skipping...");
+					log.warning("'" + tweetFile.getName() + "'" + " is a directory, skipping");
 					continue; //Continue to the next item in the loop
 					
 				}else {
@@ -174,14 +180,14 @@ public class BotDriver {
 					
 				}else {
 					
-					System.out.println("'" + tweetFile.getName() + "'" + " is greater than " + this.STATUS_CHARACTER_MAX + " characters, skipping...");
+					log.warning("'" + tweetFile.getName() + "'" + " is greater than " + this.STATUS_CHARACTER_MAX + " characters, skipping");
 					
 				}
 				
 				//Catches if it does not work and give error and shutdown
 			} catch (FileNotFoundException e) {
 				
-				System.out.println("Error Reading Files! Shutting Down...");
+				log.severe("Error Reading Files! Shutting Down");
 				e.printStackTrace();
 				System.exit(0);
 				
@@ -192,7 +198,7 @@ public class BotDriver {
 		//If the map is not empty report that it # of tweets loaded successfully
 		if(!this.tweets.isEmpty()) {
 			
-			System.out.println(mapCounter + " Tweets Loaded Successfully!");
+			log.info(mapCounter + " Tweets Loaded Successfully!");
 			
 		}else {
 			
@@ -203,7 +209,7 @@ public class BotDriver {
 	}
 	
 	//Returns a random tweet from the hashmap
-	public String getRandomStatusUpdate() {
+	private String getRandomStatusUpdate() {
 		
 		Random randomTweet = new Random();
 		int tweetAtPosition = randomTweet.nextInt(this.tweets.size());
@@ -214,7 +220,7 @@ public class BotDriver {
 	
 	//Method to tweet a new status to twitter takes a String parameter and that is the message the user entered
 	@SuppressWarnings("unused")
-	public void statusUpdate() {
+	private void statusUpdate() {
 		
 		//Creates twitter object to connect
 		Twitter twitter = TwitterFactory.getSingleton();
@@ -228,211 +234,48 @@ public class BotDriver {
 			
 			Status status = twitter.updateStatus(tweet);
 			
-			System.out.println("Successfully updated the status to \"" + tweet + "\"");
-			
-			setOutputStreamToConsole(); //set the stream to the console, print the lines
-			System.out.println("Successfully updated the status to \"" + tweet + "\"");
-			System.out.println("Type in 'stop' to stop the program at any time...");
-			System.out.println();
-			
-			setOutputStreamToLogFile(); // go back to the log file again
+			log.info("Successfully updated the status to \"" + tweet + "\"");
+			log.info("Type in 'stop' to stop the program at any time");
 			
 		} catch (TwitterException e) {
 			
-			System.out.println("Unable to update Status...");
-			setOutputStreamToConsole();
-			System.out.println("Unable to update Status...");
-			System.out.println("Type in 'stop' to stop the program at any time...");
-			setOutputStreamToLogFile();
+			log.severe("Unable to update Status...");
 			
 			e.printStackTrace();
-			
-		}
-		
-	}
-	
-	//checks for the logs files/directories
-	public void checkForLogs() {
-		
-		//creates the log directory object
-		File logDirectory = new File(this.logDirectoryLocation);
-		
-		//if the directory does not exist then make one
-		if(!logDirectory.exists()) {
-			
-			System.out.println("No logs directory exists! Creating directory...");
-			logDirectory.mkdir();
-			
-		}
-		
-		//If the log file does not exist then create one, catch it does not and report it
-		if(!this.logFile.exists()) {
-			
-			try {
-				
-				this.logFile.createNewFile();
-				System.out.println("'logs.txt' file does not exist. Creating...");
-				
-			} catch (IOException e) {
-				
-				System.out.println("Unable to create 'logs.txt' file...");
-				e.printStackTrace();
-				
-			}
 			
 		}
 		
 	}
 	
 	//Method to check if any tweets exists, if they do not then shutdown the bot because it can not tweet anything
-	public void checkForTweets() {
+	private void checkForTweets() {
 		
 		//If the map is empty report and exit the program because it can do nothing
 		if(this.tweets.isEmpty()) {
 			
-			System.out.println("There are no tweets loaded...");
+			log.warning("There are no tweets loaded");
 			
 		}
 		
 	}
 	
 	//Check to see if the tweets directory is 
-	public void checkTweetsDirectory() {
+	private void checkTweetsDirectory() {
 		
 		//checks if it exists in the system and creates one if it does not
 		if(!this.directory.exists()) {
 			
-			System.out.println("No tweets directory exists! Creating directory...");
+			log.info("No tweets directory exists! Creating directory");
 			this.directory.mkdir();
 			
 		}
 		
 	}
 	
-	public void checkForAllFilesAndDirectories() {
+	private void checkForAllFilesAndDirectories() {
 		
 		//check if the tweets directory exists
 		checkTweetsDirectory();
-		
-		//Check if the logs directories and files exists
-		checkForLogs();
-		
-	}
-	
-	//Start the logging system in the program
-	public void startLoggingSystem() {
-		
-		//Print console message
-		System.out.println("Logging System Loading...");
-		 
-		//Try and catch statement for the log file
-		try {
-			
-			this.temporaryLogFile = File.createTempFile("runningLogs", ".tmp"); //Create temporary log file
-			
-		} catch (IOException e) {
-			
-			e.printStackTrace();
-			
-		}
-		
-		//Try and catch statement
-		try {
-			
-			this.loggingFilePrintStream = new PrintStream(this.temporaryLogFile); //Set the print stream of the program to the temp log file
-			
-		} catch (FileNotFoundException e) {
-			
-			e.printStackTrace();
-			
-		}
-		
-		System.out.println("Logs loaded. Switching from console to 'logs.txt' file..."); //print message about successful log file
-		System.out.println("Type 'stop' to shut down the program...");
-		System.out.println();
-		setOutputStreamToLogFile(); //set the print stream to the log file
-		System.out.println("Successfully switched to 'logs.txt' file..."); //Print first message to log file
-		
-	}
-	
-	//Method to save the logs to the logs.txt file properly
-	public void writeLogs() {
-		
-		//Print a log message
-		System.out.println("Saving 'logs.txt' file...");
-		
-		//Set the scanner and print writer to null to prepare to use
-		Scanner readLogs = null;
-		FileWriter logWriter = null;
-		
-		//Try and catch statement for file writer
-		try {
-			
-			logWriter = new FileWriter(this.logFileLocation, true);
-			
-		} catch (IOException e1) {
-			
-			System.out.println("Unable to set logWriter...");
-			e1.printStackTrace();
-			
-		}
-			
-		
-		//Try and catch statement
-		try {
-			
-			readLogs = new Scanner(this.temporaryLogFile); //read the entirety of the temp log file into scanner
-			
-		} catch (FileNotFoundException e) {
-
-			e.printStackTrace();
-			
-		}
-		
-		//while the scanner has a next word, read it and print to the file logs.txt
-		while(readLogs.hasNext()) {
-			
-			try {
-				
-				logWriter.write(readLogs.nextLine() + "\n");//write each line to the logs.txt file
-				
-			} catch (IOException e) {
-				
-				System.out.println("Unable to write log files to logs.txt...");
-				e.printStackTrace();
-				
-			}
-			
-		}
-		
-		//try catch statement to close the print writer
-		try {
-			
-			logWriter.close(); //close the print writer
-			
-		} catch (IOException e) {
-			
-			System.out.println("Unable to close the logWriter...");
-			e.printStackTrace(); 
-			
-		} 
-		
-		setOutputStreamToConsole(); //go back to the console
-		System.out.println("'logs.txt' file saved..."); //print message about successful save to console
-		
-	}
-	
-	//Set the output stream to the log file in the program
-	public void setOutputStreamToLogFile() {
-		
-		System.setOut(this.loggingFilePrintStream);
-		
-	}
-	
-	//Set the output stream to the console in the program
-	public void setOutputStreamToConsole() {
-		
-		System.setOut(this.consoleStream);
 		
 	}
 	
