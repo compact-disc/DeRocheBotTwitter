@@ -1,4 +1,4 @@
-# deroche-bot-twitter
+# DeRocheBotTwitter
 
 This project was created to practice using API from another party, in this case, Twitter. DeRoche Bot gave additional practice with timers/timing in java along with file reading and writing using some of the included java libraries. Keeping the code well documented allows for easy future expansion and review of previously written code.
 
